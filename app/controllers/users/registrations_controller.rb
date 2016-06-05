@@ -4,7 +4,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
    #GET /resource/sign_up
    def new
-     super
+    @redirect_url = nil
+    if !params[:redirect_url].nil?
+      @redirect_url = params[:redirect_url]
+    end
+    build_resource({})
+    yield resource if block_given?
+    respond_with resource
    end
 
    #POST /resource
@@ -50,8 +56,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
    #The path used after sign up.
    def after_sign_up_path_for(resource)
-     #super(resource)
-      'http://www.google.com'
+     if params[:user][:redirect_url].nil?
+      super(resource)
+     else
+      params[:user][:redirect_url] + "?authentication_token=" + resource.authentication_token
+     end
    end
 
    #The path used after sign up for inactive accounts.

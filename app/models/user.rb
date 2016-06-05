@@ -1,5 +1,8 @@
 class User
   include Mongoid::Document
+
+  before_save :filter_fields
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -37,5 +40,17 @@ class User
 
   acts_as_token_authenticatable
   field :authentication_token
+
+
+  ##params for the redirect url.
+  field :redirect_url
+
+  protected
+
+
+  def filter_fields
+    remove_attribute(:redirect_url)
+    attributes
+  end
 
 end
