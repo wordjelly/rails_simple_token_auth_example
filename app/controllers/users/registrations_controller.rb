@@ -58,9 +58,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
    def after_sign_up_path_for(resource)
      if params[:user][:redirect_url].nil?
       super(resource)
-     else
-      params[:user][:redirect_url] + "?authentication_token=" + resource.authentication_token
      end
+     params[:user][:redirect_url] + "?authentication_token=" + resource.authentication_token + "&es=" + resource.es
    end
 
    #The path used after sign up for inactive accounts.

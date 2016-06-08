@@ -2,6 +2,9 @@ class User
   include Mongoid::Document
 
   before_save :filter_fields
+  before_save do |document|
+    document.set_es
+  end
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -42,10 +45,29 @@ class User
   field :authentication_token
 
 
-  ##params for the redirect url.
+
+
+  #redirect url field, this is never persisted.
   field :redirect_url
 
+  ##email salt
+  ##generated before_save
+  ##built by prepending a SECURERANDOM SALT to the email, and then 
+  ##running SHA256 on it.
+  ##this is used as the user identifier key in the config for the 
+  ##simple_token_authentication gem.
+  ##refer method : set_es
+  field :es
+
   protected
+
+  def set_es
+    if !email.nil?
+      salt = SecureRandom.hex(32)
+      pre_es = salt + email
+      self.es = Digest::SHA256.hexdigest(pre_es)
+    end
+  end
 
 
   def filter_fields
